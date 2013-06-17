@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Statistics/Sequences/Runs.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-useok.t
+t/01-sum_events.t
+t/02-ref_data.t
+t/03-nil_data.t
+t/04-exact_p.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml
