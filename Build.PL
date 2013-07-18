@@ -11,8 +11,8 @@ my $builder = Module::Build->new(
     build_requires => {
         'Test::More' => 0,
         'Statistics::Zed' => '0.072',
-        'Statistics::Sequences' => '0.10',
-        'Moose' => '2.0604',
+        'Statistics::Sequences' => '0.11',
+        #'Moose' => '2.0604',
         'Number::Misc' => '1.0',
         'List::AllUtils' => '0.03',
     },
@@ -22,7 +22,7 @@ my $builder = Module::Build->new(
     requires => {
         'perl' => 5.006,
     },
-    add_to_cleanup      => [ 'Statistics-Sequences-Runs-0.10-*' ],
+    add_to_cleanup      => [ 'Statistics-Sequences-Runs-0.11-*' ],
     create_makefile_pl => 'traditional',
 );
 

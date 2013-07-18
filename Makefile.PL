@@ -7,9 +7,8 @@ WriteMakefile
   'VERSION_FROM' => 'lib/Statistics/Sequences/Runs.pm',
   'PREREQ_PM' => {
                    'List::AllUtils' => '0.03',
-                   'Moose' => '2.0604',
                    'Number::Misc' => '1.0',
-                   'Statistics::Sequences' => '0.10',
+                   'Statistics::Sequences' => '0.11',
                    'Statistics::Zed' => '0.072',
                    'Test::More' => 0
                  },

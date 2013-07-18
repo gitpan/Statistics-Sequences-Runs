@@ -5,16 +5,16 @@ use strict;
 use warnings;
 use Carp qw(carp croak);
 use vars qw($VERSION @ISA);
-use Statistics::Sequences 0.10;
-#@ISA = qw(Statistics::Sequences);
-use Moose;
-extends 'Statistics::Sequences';
+use Statistics::Sequences 0.11;
+@ISA = qw(Statistics::Sequences);
+#use Moose;
+#extends 'Statistics::Sequences';
 use List::AllUtils qw(sum uniq);
 use Number::Misc 'is_even';
 use Statistics::Zed 0.072;
 our $zed = Statistics::Zed->new();
 
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 =pod
 
@@ -25,7 +25,7 @@ Statistics::Sequences::Runs - observed, expected and variance counts, deviation 
 =head1 SYNOPSIS
 
  use strict;
- use Statistics::Sequences::Runs 0.10; # methods/args here are not compatible with earlier versions
+ use Statistics::Sequences::Runs 0.11; # methods/args here are not compatible with earlier versions
  my $runs = Statistics::Sequences::Runs->new();
  $runs->load(qw/1 0 0 0 1 1 0 1 1 0 0 1 0 0 1 1 1 1 0 1/); # dichotomous sequence (any values); or send as "data => $aref" with each stat call
  my $val = $runs->observed(); # other methods include: expected(), variance(), obsdev() and stdev()
@@ -69,10 +69,12 @@ Alternatively, skip this action; data don't always have to be loaded to use the 
 
 Every load unloads all previous loads and any additions to them.
 
+=cut
+
 sub load {
     my $self = shift;
     $self->SUPER::load(@_);
-    my $data = $self->read(@_);
+    my $data = $self->read(index => -1);
     my $nuniq = scalar(uniq(@{$data}));
     if ($nuniq > 2) {
         carp __PACKAGE__, ' More than two elements were found in the data: ' . join(' ', uniq(@$data));
@@ -146,7 +148,7 @@ Returns the variance in the number of runs for the given data.
 
 =for html <p>&nbsp;&nbsp;<i>V[R]</i> = ( (2<i>n</i><sub>1</sub><i>n</i><sub>2</sub>)([2<i>n</i><sub>1</sub><i>n</i><sub>2</sub>] &ndash; [<i>n</i><sub>1</sub> + <i>n</i><sub>2</sub>]) ) / ( ((<i>n</i><sub>1</sub> + <i>n</i><sub>2</sub>)<sup>2</sup>)((<i>n</i><sub>1</sub> + <i>n</i><sub>2</sub>) &ndash; 1) ) </p>
 
-defined as above for L<runcount_expected|expected, runcount_expected, rce>.
+defined as above for L<runcount_expected|Statistics::Sequences::Runs/expected, runcount_expected, rce>.
 
 The data to test can already have been L<load|load>ed, or you send it directly as a flat referenced array keyed as B<data>.
 
@@ -244,7 +246,7 @@ sub z_value {
  $p = $runs->p_value(data => [1, 0, 1, 1, 0], exact => 1); #  using given data (by-passing load and read)
  $p = $runs->p_value(trials => [12, 12], observed => 8); # without using data, specifying N-per-event and run-count
 
-Returns the probability of getting the observed number of runs or a smaller number given the number of each of the two events. By default, a large sample is assumed, and the probability is obtained from the normalized deviation, as given by the L<zscore|Statistics::Sequences:Runs/zscore> method.
+Returns the probability of getting the observed number of runs or a smaller number given the number of each of the two events. By default, a large sample is assumed, and the probability is obtained from the normalized deviation, as given by the L<zscore|Statistics::Sequences::Runs/z_value, runcount_zscore, rzs, zscore> method.
 
 If the option B<exact> is defined and does not equal zero, then the probability is worked out combinatorially, as per Swed & Eisenhart (1943), Eq. 1, p. 66 (see also Siegal, 1956, Eqs. 6.12a and 6.12b, p. 138). By default, this is a one-tailed test, testing the hypotheses that there are either too many or too few runs relative to chance expectation. Which hypothesis can be specified by giving B<exact> => 1 (upper-tail test that observed runs >= expected runs), or to -1 (lower-tail test that observed runs < expected runs). Alternatively, if B<exact> is set to any other value (e.g., 'auto'), the "correct" hypothesis is tested based on the expected value returned by the L<expected|Statistics::Sequences::Runs/expected, runcount_expected, rce> method. Setting B<tails> => 2 simply doubles the one-tailed I<p>-value from any of these tests. Output from these tests has been checked against the tables and examples in Swed & Eisenhart (given to 7 decimal places), and found to agree.
 
@@ -423,7 +425,7 @@ In a single run of a classic ESP test, there are 25 trials, each composed of a r
  print "Probability of these many runs vs expectation: ", $runs->test(), "\n"; # 0.51436
  # or test for runs in matching when responses are matched to targets one trial behind:
  print $runs->test(data => $ddat->match(data => [\@targets, \@responses], lag => -1)), "\n"; # 0.73766
- 
+
 =head1 REFERENCES
 
 These papers provide the implemented algorithms and/or the sample data used in tests. 

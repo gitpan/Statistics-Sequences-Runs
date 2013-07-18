@@ -1,4 +1,9 @@
-Revision history for Statistics-Sequences-Runs-0.10
+Revision history for Statistics-Sequences-Runs-0.11
+
+0.11    July 2013
+        load() checks last loaded sequence as composed of only two elements by reading with index => -1
+        De-Moosified
+        Misc POD revisions only
 
 0.10    June 2013
         Integrated with new Statistics-Sequences - not compatible with prior versions. 
