@@ -1,6 +1,6 @@
-Statistics-Sequences-Runs-0.11
+Statistics-Sequences-Runs-0.12
 
-Version 0.11
+Version 0.12
 fixes for the module are worth downloading.
 
 
@@ -30,16 +30,16 @@ perldoc command.
 You can also look for information at:
 
     RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Statistics-Sequences-Runs-0.11
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Statistics-Sequences-Runs-0.12
 
     AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Statistics-Sequences-Runs-0.11
+        http://annocpan.org/dist/Statistics-Sequences-Runs-0.12
 
     CPAN Ratings
-        http://cpanratings.perl.org/d/Statistics-Sequences-Runs-0.11
+        http://cpanratings.perl.org/d/Statistics-Sequences-Runs-0.12
 
     Search CPAN
-        http://search.cpan.org/dist/Statistics-Sequences-Runs-0.11/
+        http://search.cpan.org/dist/Statistics-Sequences-Runs-0.12/
 
 
 LICENSE AND COPYRIGHT

@@ -58,6 +58,7 @@ $val = $runs->test(exact => 2); # should be same effect as exact => 1 as rco > r
 ok(equal($val, $ref{'swed_1943_3'}->{'p_exact'}) , "exact p_value observed $val != $ref{'swed_1943_3'}->{'p_exact'}");
 
 sub equal {
+    return 0 if ! defined $_[0] || ! defined $_[1];
     return 1 if $_[0] + EPS > $_[1] and $_[0] - EPS < $_[1];
     return 0;
 }

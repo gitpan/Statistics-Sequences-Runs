@@ -107,12 +107,12 @@ $val = $runs->observed(label => 'reiterdata');
 ok(equal($val, $refdat{'reiter'}->{'observed'}), "runcount_observed  $val != $refdat{'reiter'}->{'observed'}");
 
 # trying to access by index:
-eval { $runs->load(['somedata'], $refdat{'reiter'}->{'data'});};
+eval { $runs->load('somedata' => $refdat{'reiter'}->{'data'});};
 ok(!$@);
-$val = $runs->observed(index => 1);
+$val = $runs->observed(index => 0);
 ok(equal($val, $refdat{'reiter'}->{'observed'}), "runcount_observed  $val != $refdat{'reiter'}->{'observed'}");
 
-# a direct "load"
+# don't use load() but give data within this module's methods
 $val = $runs->observed(data => $refdat{'reiter'}->{'data'});
 ok(equal($val, $refdat{'reiter'}->{'observed'}), "runcount_observed  $val != $refdat{'reiter'}->{'observed'}");
 # -- even works all the way to deviation p_value?
@@ -120,6 +120,7 @@ $val = $runs->p_value(data => $refdat{'reiter'}->{'data'}, exact => 0, ccorr => 
 ok(equal($val, $refdat{'reiter'}->{'p_value'}), "runcount_p_value  $val != $refdat{'reiter'}->{'p_value'}");
 
 sub equal {
+    return 0 if ! defined $_[0] || ! defined $_[1];
     return 1 if $_[0] + EPS > $_[1] and $_[0] - EPS < $_[1];
     return 0;
 }

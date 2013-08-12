@@ -1,14 +1,16 @@
-Revision history for Statistics-Sequences-Runs-0.11
+Revision history for Statistics-Sequences-Runs-0.12
 
-0.11    July 2013
-        load() checks last loaded sequence as composed of only two elements by reading with index => -1
-        De-Moosified
-        Misc POD revisions only
+0.12 2013.08.12
+    - fixed an anomaly in a test file that became incompatible with latest version (0.06+) of Statistics::Data.
 
-0.10    June 2013
-        Integrated with new Statistics-Sequences - not compatible with prior versions. 
+0.11 2013.07.01
+    - load() checks last loaded sequence as composed of only two elements by reading with index => -1
+    - De-Moosified
+    - Misc POD revisions only
 
-0.01	Mon Oct  8 19:53:11 2012
+0.10 2013.06.01
+    - uses Statistics-Sequences as base, which use Statistics::Data as its base - not compatible with prior versions (<= 0.06). 
 
-        First version, released on an unsuspecting world.
+0.01 2006.12.31
+    - First version, released on an unsuspecting world.
 

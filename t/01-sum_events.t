@@ -13,6 +13,7 @@ ok(equal($frq[0], 3), "element 1 frequency: observed = $frq[0]\texpected = 3");
 ok(equal($frq[1], 1), "element 2 frequency: observed = $frq[1]\texpected = 1");
 
 sub equal {
+    return 0 if ! defined $_[0] || ! defined $_[1];
     return 1 if $_[0] == $_[1];
     return 0;
 }

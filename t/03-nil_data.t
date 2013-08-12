@@ -45,6 +45,7 @@ ok(equal($val, 0), "ztest_ok  $val != 0");
 
 
 sub equal {
+    return 0 if ! defined $_[0] || ! defined $_[1];
     return 1 if $_[0] + EPS > $_[1] and $_[0] - EPS < $_[1];
     return 0;
 }

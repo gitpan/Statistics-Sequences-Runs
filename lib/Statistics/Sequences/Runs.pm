@@ -1,20 +1,13 @@
 package Statistics::Sequences::Runs;
-
 use 5.008008;
 use strict;
-use warnings;
+use warnings FATAL => 'all';
 use Carp qw(carp croak);
-use vars qw($VERSION @ISA);
-use Statistics::Sequences 0.11;
-@ISA = qw(Statistics::Sequences);
-#use Moose;
-#extends 'Statistics::Sequences';
+use base qw(Statistics::Sequences);
 use List::AllUtils qw(sum uniq);
 use Number::Misc 'is_even';
 use Statistics::Zed 0.072;
-our $zed = Statistics::Zed->new();
-
-$VERSION = '0.11';
+our $VERSION = "0.12";
 
 =pod
 
@@ -22,10 +15,14 @@ $VERSION = '0.11';
 
 Statistics::Sequences::Runs - observed, expected and variance counts, deviation and combinatorial tests, of Wald-type runs
 
+=head1 VERSION
+
+This is documentation for Version 0.12 of Statistics::Sequences::Runs.
+
 =head1 SYNOPSIS
 
  use strict;
- use Statistics::Sequences::Runs 0.11; # methods/args here are not compatible with earlier versions
+ use Statistics::Sequences::Runs 0.12; # methods/args here are not compatible with earlier versions
  my $runs = Statistics::Sequences::Runs->new();
  $runs->load(qw/1 0 0 0 1 1 0 1 1 0 0 1 0 0 1 1 1 1 0 1/); # dichotomous sequence (any values); or send as "data => $aref" with each stat call
  my $val = $runs->observed(); # other methods include: expected(), variance(), obsdev() and stdev()
@@ -45,9 +42,9 @@ More runs than expected ("negative serial dependence") can denote irregularity, 
 
 The distribution of runs is asymptotically normal, and a deviation-based test of extra-chance occurrence when at least one alternative has more than 20 occurrences (Siegal rule), or both event occurrences exceed 10 (Kelly, 1982), is conventionally considered reliable; otherwise, consider exact test option.
 
-Have non-dichotomous, continuous or multinomial data? See L<Statistics::Data::Dichotomize> for how to prepare non-dichotomous data, whether numerical or made up of categorical events, for test of runs.
+Have non-dichotomous, continuous or multinomial data? See L<Statistics::Data::Dichotomize|Statistics::Data::Dichotomize> for how to prepare non-dichotomous data, whether numerical or made up of categorical events, for test of runs.
 
-=head1 METHODS
+=head1 SUBROUTINES/METHODS
 
 =head2 new
 
@@ -74,10 +71,10 @@ Every load unloads all previous loads and any additions to them.
 sub load {
     my $self = shift;
     $self->SUPER::load(@_);
-    my $data = $self->read(index => -1);
-    my $nuniq = scalar(uniq(@{$data}));
+    my $data = $self->access(index => -1);
+    my $nuniq = scalar uniq(@{$data});
     if ($nuniq > 2) {
-        carp __PACKAGE__, ' More than two elements were found in the data: ' . join(' ', uniq(@$data));
+        carp __PACKAGE__, ' More than two elements were found in the data: ' . join(q{ }, uniq(@{$data}));
         return 0;
     }
     else {
@@ -87,7 +84,7 @@ sub load {
 
 =head2 add, read, unload
 
-See L<Statistics::Data> for these additional operations on data that have been loaded.
+See L<Statistics::Data|Statistics::Data> for these additional operations on data that have been loaded.
 
 =head2 observed, runcount_observed, rco
 
@@ -103,8 +100,8 @@ Returns the observed number of runs in the loaded or given data.
 sub observed {
     my $self = shift;
     my $args = ref $_[0] ? $_[0] : {@_};
-    my $data = ref $args->{'data'} ? $args->{'data'} : $self->read($args);
-    my $num = scalar(@$data);
+    my $data = ref $args->{'data'} ? $args->{'data'} : $self->access($args);
+    my $num = scalar @{$data};
     my ($rco, $i) = (0, 0);
     foreach (; $i < $num; $i++) {
         $rco++ if !$i || ( $data->[$i] ne $data->[$i - 1] );
@@ -159,7 +156,7 @@ sub variance {
    my $args = ref $_[0] ? $_[0] : {@_};
    my ($n1, $n2) = _get_run_Ns($self, $args);
    my $sum = $n1 + $n2;
-   return $sum < 2 ? 1 : (( 2 * $n1 * $n2 * ( ( 2 * $n1 * $n2 ) - $sum) ) 
+   return $sum < 2 ? 1 : (( 2 * $n1 * $n2 * ( ( 2 * $n1 * $n2 ) - $sum) )
             /
            ( ( $sum**2 ) * ( $sum - 1 ) ));
 }
@@ -190,7 +187,7 @@ Returns square-root of the variance.
 =cut
 
 sub stdev {
-    return sqrt(variance(@_));
+    return sqrt variance(@_);
 }
 *standard_deviation = \&stdev;
 
@@ -220,16 +217,17 @@ sub z_value {
        $stat_args{'trials'} = $args->{'trials'};
    }
    else {
-       $stat_args{'data'} = ref $args->{'data'} ? $args->{'data'} : $self->read($args);
+       $stat_args{'data'} = ref $args->{'data'} ? $args->{'data'} : $self->access($args);
    }
    my $rco = defined $args->{'observed'} ? $args->{'observed'} : $self->rco(\%stat_args); # giving rco the data
+   my $zed = Statistics::Zed->new();
    my ($zval, $pval) = $zed->zscore(
         observed => $rco,
         expected => $self->rce(\%stat_args),
         variance => $self->rcv(\%stat_args),
         ccorr => $ccorr,
         tails => $tails,
-        precision_s => $precision_s, 
+        precision_s => $precision_s,
         precision_p => $precision_p,
      );
     return wantarray ? ($zval, $pval) : $zval;
@@ -282,7 +280,6 @@ sub ztest_ok {
     my $self = shift;
     my $args = ref $_[0] ? $_[0] : {@_};
     my ($n1, $n2) = _get_run_Ns($self, $args);
-    #my $sum = $n1 + $n2;
     my $retval = $n1 > 20 || $n2 > 20 ? 1 : 0; # Siegal's rule (p. 140) - ok if either of the two Ns are greater than 20
     return $retval;
 }
@@ -306,6 +303,7 @@ sub dump {
     my $args = ref $_[0] ? $_[0] : {@_};
     $args->{'stat'} = 'runs';
     $self->SUPER::dump($args);
+    return;
 }
 
 =head2 dump_data
@@ -318,19 +316,19 @@ See L<Statistics::Sequences/dump_data> for details.
 
 sub _test_exact {
     my ($self, $args) = @_;
-    
+
     # Number of runs per event to use in calculation:
     my ($n1, $n2) = _get_run_Ns($self, $args);
     my $sum = $n1 + $n2;
     my $n1m = $n1 - 1;
     my $n2m = $n2 - 1;
-    
+
     # Calc appropriate rco value based on hypothesis being tested:
     my $rco = defined $args->{'observed'} ? $args->{'observed'} : $self->rco($args);
     my $correct_h = ( $rco - $self->rce($args) >= 0 ) ? 1 : -1; # lower or upper tail test?
-    my $wanted_h = $args->{'exact'} eq '1' ? 1 : $args->{'exact'} eq '-1' ? -1 : $correct_h; 
+    my $wanted_h = $args->{'exact'} eq '1' ? 1 : $args->{'exact'} eq '-1' ? -1 : $correct_h;
     $rco-- if $wanted_h == 1; # test Hypothesis that rco is greater than expectation
-    
+
     # Calc the probability: from Swed & Eisenhart 1943, p. 66, Eq 1:
     my ($psum, $pval, $i, $k) = (0);
     for ($i = 2; $i <= $rco; $i++) {
@@ -354,30 +352,30 @@ sub _test_exact {
     $pval *= 2 if $args->{'tails'} and $args->{'tails'} == 2;
 
     return $pval;
+}
 
-    sub _choose { # from Orwant et al., p. 573
-        my ($n, $k) = @_;
-        my ($res, $j) = (1, 1);
-        return 0 if $k > $n || $k < 0;
-        $k = ($n - $k) if ($n - $k) < $k;
-        while ($j <= $k) {
-            $res *= $n--;
-            $res /= $j++;
-        }
-        return $res;
+sub _choose { # from Orwant et al., p. 573
+    my ($n, $k) = @_;
+    my ($res, $j) = (1, 1);
+    return 0 if $k > $n || $k < 0;
+    $k = ($n - $k) if ($n - $k) < $k;
+    while ($j <= $k) {
+        $res *= $n--;
+        $res /= $j++;
     }
+    return $res;
 }
 
 sub _get_run_Ns {
    my ($self, $args) = @_;
    return @{$args->{'trials'}} if ref $args->{'trials'};
-   return _calc_run_Ns( ref $args->{'data'} ? $args->{'data'} : $self->read($args));
+   return _calc_run_Ns( ref $args->{'data'} ? $args->{'data'} : $self->access($args));
 }
 
 sub _calc_run_Ns {
     # find  frequency of all unique elements in array without knowing what elements are - expecting only two but 1 is ok
     my ($data, @vals, %states) = (shift);
-    $states{$_}++ for @$data; # init a hash keying each element and its frequency:
+    $states{$_}++ for @{$data}; # init a hash keying each element and its frequency:
     @vals = values %states;# get the two (?) values
     push(@vals, 0) if scalar @vals < 2;
     return @vals;
@@ -444,11 +442,11 @@ Wolfowitz, J. (1943). On the theory of runs with some applications to quality co
 
 L<Statistics::Sequences|Statistics::Sequences> for other tests of sequences, and for sharing data between these tests.
 
-=head1 REVISION HISTORY
+=head1 AUTHOR
 
-See CHANGES in installation dist for revisions.
+Roderick Garton, C<< <rgarton at cpan.org> >>
 
-=head1 AUTHOR/LICENSE
+=head1 LICENSE AND COPYRIGHT
 
 =over 4
 
@@ -469,3 +467,5 @@ To the maximum extent permitted by applicable law, the author of this module dis
 This ends documentation of a Perl implementation of the Wald-Walfowitz Runs test for randomness and group differences within a sequence.
 
 =cut
+
+1; # end of Statistics::Sequences::Runs
